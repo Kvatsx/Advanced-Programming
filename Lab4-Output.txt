@@ -1,0 +1,21 @@
+The Simulation Begins -
+It is First Herbivore.
+It is dead.
+
+It is Second Carnivore.
+It’s health after taking turn is 25.0
+
+It is First Carnivore.
+It is dead.
+
+It is Second Carnivore.
+It’s health after taking turn is 25.0
+
+It is Second Herbivore.
+It’s health after taking turn is 15.0
+
+It is Second Herbivore.
+It’s health after taking turn is 22.5
+
+It is Second Herbivore.
+It’s health after taking turn is 27.0

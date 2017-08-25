@@ -62,7 +62,7 @@ abstract class Animal {
 	{
 		return x*x+y*y;
 	}
-	protected abstract boolean TakeTurn(Grassland gLand1, Grassland gLand2, Herbivore first_H, Herbivore second_H, Carnivore first_C, Carnivore second_C);
+	protected abstract Object[] TakeTurn(Grassland gLand1, Grassland gLand2, Herbivore first_H, Herbivore second_H, Carnivore first_C, Carnivore second_C);
 }
 
 class Herbivore extends Animal {
@@ -73,7 +73,7 @@ class Herbivore extends Animal {
 		this.setGcapacity(G);
 	}
 	@Override
-	public boolean TakeTurn(Grassland gLand1, Grassland gLand2, Herbivore first_H, Herbivore second_H, Carnivore first_C, Carnivore second_C)
+	public Object[] TakeTurn(Grassland gLand1, Grassland gLand2, Herbivore first_H, Herbivore second_H, Carnivore first_C, Carnivore second_C)
 	{
 		TurnCounter++;
 		int d1 = (gLand1.getx()-this.getx())*(gLand1.getx()-this.getx()) + (gLand1.gety()-this.gety())*(gLand1.gety()-this.gety());
@@ -84,16 +84,52 @@ class Herbivore extends Animal {
 			{
 				if ( d1 <= d2 )
 				{
-					// Herbivose will go towards Grass gLand1.
-					this.setx(gLand1.getx());
-					this.sety(gLand1.gety());
+					// Herbivose will go towards Grass gLand1.			
+					if ( Math.sqrt(d1) <= gLand1.getRadius() )
+					{
+						double m = Math.sqrt(d2)-5;
+						int n = 5;
+						double xn = ((double)(m*(this.getx())+n*(gLand2.getx())))/(double)(m+n);
+						double yn = ((double)(m*(this.getx())+n*(gLand2.gety())))/(double)(m+n);
+						this.setx((int)Math.round(xn));
+						this.sety((int)Math.round(yn));
+					}
+					else
+					{
+						double m = Math.sqrt(d1)-5;
+						int n = 5;
+						double xn = ((double)(m*(this.getx())+n*(gLand1.getx())))/(double)(m+n);
+						double yn = ((double)(m*(this.getx())+n*(gLand1.gety())))/(double)(m+n);
+						this.setx((int)Math.round(xn));
+						this.sety((int)Math.round(yn));
+					}
 				}
 				else
 				{
 					// Herbivore will go towards Grass gLand2.
-					this.setx(gLand2.getx());
-					this.sety(gLand2.gety());
+					if ( Math.sqrt(d2) < gLand2.getRadius() )
+					{
+						double m = Math.sqrt(d1)-5;
+						int n = 5;
+						double xn = ((double)(m*(this.getx())+n*(gLand1.getx())))/(double)(m+n);
+						double yn = ((double)(m*(this.getx())+n*(gLand1.gety())))/(double)(m+n);
+						this.setx((int)Math.round(xn));
+						this.sety((int)Math.round(yn));
+					}
+					else
+					{
+						double m = Math.sqrt(d2)-5;
+						int n = 5;
+						double xn = ((double)(m*(this.getx())+n*(gLand2.getx())))/(double)(m+n);
+						double yn = ((double)(m*(this.getx())+n*(gLand2.gety())))/(double)(m+n);
+						this.setx((int)Math.round(xn));
+						this.sety((int)Math.round(yn));
+					}
 				}
+			}
+			else
+			{
+				// Stay at his position.
 			}
 		}
 		else
@@ -131,12 +167,23 @@ class Herbivore extends Animal {
 					}
 					else
 					{
+						d1 = Integer.MAX_VALUE;
+						d2 = Integer.MAX_VALUE;
+						if ( first_C != null )
+						{
+							d1 = (first_C.getx()-this.getx())*(first_C.getx()-this.getx()) + (first_C.gety()-this.gety())*(first_C.gety()-this.gety());
+						}
+						if ( second_C != null )
+						{
+							d2 = (second_C.getx()-this.getx())*(second_C.getx()-this.getx()) + (second_C.gety()-this.gety())*(second_C.gety()-this.gety());
+						}
+						
 						if ( d1 <= d2 )
 						{
 							double m = Math.sqrt(d1)+4;
 							int n = 4;
-							double xn = ((double)(m*(this.getx())-n*(gLand1.getx())))/(double)(m-n);
-							double yn = ((double)(m*(this.getx())-n*(gLand1.gety())))/(double)(m-n);
+							double xn = ((double)(m*(this.getx())-n*(first_C.getx())))/(double)(m-n);
+							double yn = ((double)(m*(this.getx())-n*(first_C.gety())))/(double)(m-n);
 							this.setx((int)Math.round(xn));
 							this.sety((int)Math.round(yn));
 						}
@@ -144,8 +191,8 @@ class Herbivore extends Animal {
 						{
 							double m = Math.sqrt(d2)+4;
 							int n = 4;
-							double xn = ((double)(m*(this.getx())-n*(gLand2.getx())))/(double)(m-n);
-							double yn = ((double)(m*(this.getx())-n*(gLand2.gety())))/(double)(m-n);
+							double xn = ((double)(m*(this.getx())-n*(second_C.getx())))/(double)(m-n);
+							double yn = ((double)(m*(this.getx())-n*(second_C.gety())))/(double)(m-n);
 							this.setx((int)Math.round(xn));
 							this.sety((int)Math.round(yn));
 						}
@@ -159,15 +206,16 @@ class Herbivore extends Animal {
 				{
 					if ( gLand1.getGrass() >= this.Gcapacity )
 					{
-						int x = (int )(Math.random() *100  + 1);
-						if ( x <= 90 )
+						if ( Math.random() <= 0.9 )
 						{
 							gLand1.setGrass(gLand1.getGrass()-this.Gcapacity);
 							this.setHealth(this.getHealth()*0.5+this.getHealth());
 						}
 						else
 						{
-							x = (int )(Math.random() *100  + 1);
+//							System.out.println("Maar gaya vo");
+							this.setHealth(this.getHealth()-25);
+							int x = (int )(Math.random() *100  + 1);
 							d1 = Integer.MAX_VALUE;
 							if ( first_C != null )
 							{
@@ -180,10 +228,10 @@ class Herbivore extends Animal {
 							}
 							if ( x <= 50 )
 							{
-								if ( d1 < d2 )
+								if ( d1 <= d2 )
 								{
-									double m = Math.sqrt(d1)+4;
-									int n = 4;
+									double m = Math.sqrt(d1)+2;
+									int n = 2;
 									double xn = ((double)(m*(this.getx())-n*(first_C.getx())))/(double)(m-n);
 									double yn = ((double)(m*(this.getx())-n*(first_C.gety())))/(double)(m-n);
 									this.setx((int)Math.round(xn));
@@ -191,8 +239,8 @@ class Herbivore extends Animal {
 								}
 								else
 								{
-									double m = Math.sqrt(d2)+4;
-									int n = 4;
+									double m = Math.sqrt(d2)+2;
+									int n = 2;
 									double xn = ((double)(m*(this.getx())-n*(second_C.getx())))/(double)(m-n);
 									double yn = ((double)(m*(this.getx())-n*(second_C.gety())))/(double)(m-n);
 									this.setx((int)Math.round(xn));
@@ -201,9 +249,11 @@ class Herbivore extends Animal {
 							}
 							else
 							{
-								if ( this.getNumber() == 2 )
+								d1 = (gLand1.getx()-this.getx())*(gLand1.getx()-this.getx()) + (gLand1.gety()-this.gety())*(gLand1.gety()-this.gety());
+								d2 = (gLand2.getx()-this.getx())*(gLand2.getx()-this.getx()) + (gLand2.gety()-this.gety())*(gLand2.gety()-this.gety());
+								if ( d1 <= d2 )
 								{
-									int m = (first_H.getx()-this.getx())*(first_H.getx()-this.getx()) + (first_H.gety()-this.gety())*(first_H.gety()-this.gety())-3;
+									double m = Math.sqrt(d1)-3;
 									int n = 3;
 									double xn = ((double)(m*(this.getx())+n*(first_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(first_H.gety())))/(double)(m+n);
@@ -212,7 +262,7 @@ class Herbivore extends Animal {
 								}
 								else
 								{
-									int m = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety())-3;
+									double m = Math.sqrt(d2)-3;
 									int n = 3;
 									double xn = ((double)(m*(this.getx())+n*(second_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(second_H.gety())))/(double)(m+n);
@@ -227,19 +277,12 @@ class Herbivore extends Animal {
 						int x = (int )(Math.random() *100  + 1);
 						if ( x <= 20 )
 						{
-							if ( gLand1.getGrass() == this.getGcapacity() )
-							{
-								this.setHealth(this.getHealth()*0.5+this.getHealth());
-							}
-							else
-							{
-								System.out.println(gLand1.getGrass() + " "+ this.getGcapacity());
-								this.setHealth(this.getHealth()*0.2+this.getHealth());
-							}
+							this.setHealth(this.getHealth()*0.2+this.getHealth());
 							gLand1.setGrass(0);
 						}
 						else
 						{
+//							System.out.println("maar gaya vo");
 							this.setHealth(this.getHealth()-25);
 							x = (int )(Math.random() *100  + 1);
 							d1 = Integer.MAX_VALUE;
@@ -275,9 +318,11 @@ class Herbivore extends Animal {
 							}
 							else
 							{
-								if ( this.getNumber() == 2 )
+								d1 = (gLand1.getx()-this.getx())*(gLand1.getx()-this.getx()) + (gLand1.gety()-this.gety())*(gLand1.gety()-this.gety());
+								d2 = (gLand2.getx()-this.getx())*(gLand2.getx()-this.getx()) + (gLand2.gety()-this.gety())*(gLand2.gety()-this.gety());
+								if ( d1 <= d2 )
 								{
-									int m = (first_H.getx()-this.getx())*(first_H.getx()-this.getx()) + (first_H.gety()-this.gety())*(first_H.gety()-this.gety())-2;
+									double m = Math.sqrt(d1)-2;
 									int n = 2;
 									double xn = ((double)(m*(this.getx())+n*(first_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(first_H.gety())))/(double)(m+n);
@@ -286,7 +331,7 @@ class Herbivore extends Animal {
 								}
 								else
 								{
-									int m = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety())-2;
+									double m = Math.sqrt(d2)-2;
 									int n = 2;
 									double xn = ((double)(m*(this.getx())+n*(second_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(second_H.gety())))/(double)(m+n);
@@ -309,6 +354,7 @@ class Herbivore extends Animal {
 						}
 						else
 						{
+							this.setHealth(this.getHealth()-25);
 							x = (int )(Math.random() *100  + 1);
 							d1 = Integer.MAX_VALUE;
 							if ( first_C != null )
@@ -324,8 +370,8 @@ class Herbivore extends Animal {
 							{
 								if ( d1 < d2 )
 								{
-									double m = Math.sqrt(d1)+4;
-									int n = 4;
+									double m = Math.sqrt(d1)+2;
+									int n = 2;
 									double xn = ((double)(m*(this.getx())-n*(first_C.getx())))/(double)(m-n);
 									double yn = ((double)(m*(this.getx())-n*(first_C.gety())))/(double)(m-n);
 									this.setx((int)Math.round(xn));
@@ -333,8 +379,8 @@ class Herbivore extends Animal {
 								}
 								else
 								{
-									double m = Math.sqrt(d2)+4;
-									int n = 4;
+									double m = Math.sqrt(d2)+2;
+									int n = 2;
 									double xn = ((double)(m*(this.getx())-n*(second_C.getx())))/(double)(m-n);
 									double yn = ((double)(m*(this.getx())-n*(second_C.gety())))/(double)(m-n);
 									this.setx((int)Math.round(xn));
@@ -343,9 +389,11 @@ class Herbivore extends Animal {
 							}
 							else
 							{
-								if ( this.getNumber() == 2 )
+								d1 = (gLand1.getx()-this.getx())*(gLand1.getx()-this.getx()) + (gLand1.gety()-this.gety())*(gLand1.gety()-this.gety());
+								d2 = (gLand2.getx()-this.getx())*(gLand2.getx()-this.getx()) + (gLand2.gety()-this.gety())*(gLand2.gety()-this.gety());
+								if ( d1 <= d2 )
 								{
-									int m = (first_H.getx()-this.getx())*(first_H.getx()-this.getx()) + (first_H.gety()-this.gety())*(first_H.gety()-this.gety())-3;
+									double m = Math.sqrt(d1)-3;
 									int n = 3;
 									double xn = ((double)(m*(this.getx())+n*(first_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(first_H.gety())))/(double)(m+n);
@@ -354,7 +402,7 @@ class Herbivore extends Animal {
 								}
 								else
 								{
-									int m = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety())-3;
+									double m = Math.sqrt(d2)-3;
 									int n = 3;
 									double xn = ((double)(m*(this.getx())+n*(second_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(second_H.gety())))/(double)(m+n);
@@ -409,9 +457,11 @@ class Herbivore extends Animal {
 							}
 							else
 							{
-								if ( this.getNumber() == 2 )
+								d1 = (gLand1.getx()-this.getx())*(gLand1.getx()-this.getx()) + (gLand1.gety()-this.gety())*(gLand1.gety()-this.gety());
+								d2 = (gLand2.getx()-this.getx())*(gLand2.getx()-this.getx()) + (gLand2.gety()-this.gety())*(gLand2.gety()-this.gety());
+								if ( d1 <= d2 )
 								{
-									int m = (first_H.getx()-this.getx())*(first_H.getx()-this.getx()) + (first_H.gety()-this.gety())*(first_H.gety()-this.gety())-2;
+									double m = Math.sqrt(d1)-2;
 									int n = 2;
 									double xn = ((double)(m*(this.getx())+n*(first_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(first_H.gety())))/(double)(m+n);
@@ -420,7 +470,7 @@ class Herbivore extends Animal {
 								}
 								else
 								{
-									int m = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety())-2;
+									double m = Math.sqrt(d2)-2;
 									int n = 2;
 									double xn = ((double)(m*(this.getx())+n*(second_H.getx())))/(double)(m+n);
 									double yn = ((double)(m*(this.getx())+n*(second_H.gety())))/(double)(m+n);
@@ -439,14 +489,20 @@ class Herbivore extends Animal {
 		}
 		if ( this.getHealth() > 0 )
 		{
-			System.out.println("Itâ€™s health after taking turn is "+this.getHealth());
-			return true;
+			System.out.println("It’s health after taking turn is "+this.getHealth());
 		}
-		else 
+		else if ( this.getHealth() <= 0 )
 		{
 			System.out.println("It is dead.");
-			return false;
 		}
+		Object[] zxc = new Object[6];
+		zxc[0] = first_H;
+		zxc[1] = second_H;
+		zxc[2] = first_C;
+		zxc[3] = second_C;
+		zxc[4] = gLand1;
+		zxc[5] = gLand2;
+		return zxc;
 	}
 	
 	public int getGcapacity() {
@@ -465,8 +521,9 @@ class Carnivore extends Animal {
 		super(X,Y,T,H,n);
 	}
 	@Override
-	public boolean TakeTurn(Grassland gLand1, Grassland gLand2, Herbivore first_H, Herbivore second_H, Carnivore first_C, Carnivore second_C)
+	public Object[] TakeTurn(Grassland gLand1, Grassland gLand2, Herbivore first_H, Herbivore second_H, Carnivore first_C, Carnivore second_C)
 	{
+		TurnCounter++;
 		if ( first_H != null || second_H != null )
 		{
 			int d1 = Integer.MAX_VALUE;
@@ -484,12 +541,12 @@ class Carnivore extends Animal {
 				if ( d1 == 1 )
 				{
 					this.setHealth(this.getHealth()+(first_H.getHealth()*(2/3)));
-					first_H = null;
+					first_H.setHealth(0);
 				}
 				else if ( d2 == 1 )
 				{
 					this.setHealth(this.getHealth()+(second_H.getHealth()*(2/3)));
-					second_H = null;
+					second_H.setHealth(0);
 				}
 				this.TurnCounter = 0;
 			}
@@ -555,7 +612,7 @@ class Carnivore extends Animal {
 						{
 							d4 = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety());
 						}
-						if ( d3 < d4 )
+						if ( d3 <= d4 )
 						{
 							double m = Math.sqrt(d3)-2;
 							int n = 2;
@@ -578,29 +635,32 @@ class Carnivore extends Animal {
 				}
 			}
 		}
-		if ( this.TurnCounter >= 7 )
+		int d0 = (first_H.getx()-this.getx())*(first_H.getx()-this.getx()) + (first_H.gety()-this.gety())*(first_H.gety()-this.gety());
+		int d5 = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety());
+		if ( TurnCounter >= 7 && d0 > 5 && d5 > 5 )
 		{
-			int d0 = (first_H.getx()-this.getx())*(first_H.getx()-this.getx()) + (first_H.gety()-this.gety())*(first_H.gety()-this.gety());
-			int d5 = (second_H.getx()-this.getx())*(second_H.getx()-this.getx()) + (second_H.gety()-this.gety())*(second_H.gety()-this.gety());
-			if ( d0 > 5 && d5 > 5 )
-			{
-				this.setHealth(this.getHealth() - 6);
-			}
-			else
-			{
-				this.TurnCounter = 0;
-			}
+			this.setHealth(this.getHealth() - 6);
+		}
+		else if ( d0 <= 5 || d5 <= 5 )
+		{
+			TurnCounter = 0;
 		}
 		if ( this.getHealth() > 0 )
 		{
-			System.out.println("Itâ€™s health after taking turn is "+this.getHealth());
-			return true;
+			System.out.println("It’s health after taking turn is "+this.getHealth());
 		}
-		else 
+		else if ( this.getHealth() <= 0 )
 		{
 			System.out.println("It is dead.");
-			return false;
 		}
+		Object[] zxc = new Object[6];
+		zxc[0] = first_H;
+		zxc[1] = second_H;
+		zxc[2] = first_C;
+		zxc[3] = second_C;
+		zxc[4] = gLand1;
+		zxc[5] = gLand2;
+		return zxc;
 	}
 }
 
@@ -740,45 +800,77 @@ public class World {
 		int Counter = 0;
 		while ( Arr.size() > 0 && Counter < Time )
 		{
+			boolean f1=false,f2=false,f3=false,f4=false;
+			boolean Main = false;
 			Animal Temp = Arr.poll();
-			if ( Temp.getClass().getName().equals("Herbivore"))
+			if ( Temp.getHealth() > 0 )
 			{
-				if ( Temp.getNumber() == 1 )
+				if ( Temp.getClass().getName().equals("Herbivore"))
 				{
-//					First_H = null;
-					System.out.println("It is First Herbivore.");
+					if ( Temp.getNumber() == 1 )
+					{
+						f1 = true;
+	//					First_H = null;
+						System.out.println("It is First Herbivore.");
+					}
+					else
+					{
+						f2 = true;
+	//					Second_H = null;
+						System.out.println("It is Second Herbivore.");
+					}
 				}
-				else
+				else if ( Temp.getClass().getName().equals("Carnivore"))
 				{
-//					Second_H = null;
-					System.out.println("It is Second Herbivore.");
+					if ( Temp.getNumber() == 1 )
+					{
+						f3 = true;
+	//					First_C = null;
+						System.out.println("It is First Carnivore.");
+					}
+					else
+					{
+						f4 = true;
+	//					Second_C = null;
+						System.out.println("It is Second Carnivore.");
+					}
 				}
+				Object[] zxc = Temp.TakeTurn(GLand1, GLand2, First_H, Second_H, First_C, Second_C);
+				First_H = (Herbivore) zxc[0];
+				Second_H = (Herbivore) zxc[1];
+				First_C = (Carnivore) zxc[2];
+				Second_C = (Carnivore) zxc[3];
+				GLand1 = (Grassland) zxc[4];
+				GLand2 = (Grassland) zxc[5];
+				if ( f1 && First_H.getHealth() > 0)
+				{
+					Main = true;
+				}
+				else if ( f2 && Second_H.getHealth() > 0)
+				{
+					Main = true;
+				}
+				else if ( f3 && First_C.getHealth() > 0)
+				{
+					Main = true;
+				}
+				else if ( f4 && Second_C.getHealth() > 0)
+				{
+					Main = true;
+				}
+				if ( Main )
+				{
+					int z = (int )(Math.random() *(Time-1)  + (Max+1));
+					if ( z < Time-1 )
+					{
+						Temp.setTimestamp(z);
+						Arr.add(Temp);
+						Max = z;
+					}
+				}
+				System.out.println();
+				Counter++;
 			}
-			else if ( Temp.getClass().getName().equals("Carnivore"))
-			{
-				if ( Temp.getNumber() == 1 )
-				{
-//					First_C = null;
-					System.out.println("It is First Carnivore.");
-				}
-				else
-				{
-//					Second_C = null;
-					System.out.println("It is Second Carnivore.");
-				}
-			}
-			if ( Temp.TakeTurn(GLand1, GLand2, First_H, Second_H, First_C, Second_C) )
-			{
-				int z = (int )(Math.random() *(Time-1)  + (Max+1));
-				if ( z < Time-1 )
-				{
-					Temp.setTimestamp(z);
-					Arr.add(Temp);
-					Max = z;
-				}
-			}
-			System.out.println();
-			Counter++;
 		}
 	}
 	

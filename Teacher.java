@@ -142,37 +142,38 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
 		return Tree_List.get(index);
 	}
 	@SuppressWarnings("unchecked")
-//	public T Addition (T x,T y)
-//	{
-//		if(y instanceof Integer)
-//		{
-//			return (T)((Integer)((Integer)(x)+(Integer)(y)));
-//		}
-//		if(y instanceof String)
-//		{
-//			return (T)(String)((String)(x)+(String)(y));
-//		}
-//		if ( y instanceof Float )
-//		{
-//			return (T)(Float)((Float)(x)+(Float)(y));
-//		}
+	public T Addition (T x,T y)
+	{
+		if(y instanceof Integer && x instanceof Integer)
+		{
+			return (T)((Integer)((Integer)(x)+(Integer)(y)));
+		}
+		if(y instanceof String && x instanceof String)
+		{
+			return (T)(String)((String)(x)+(String)(y));
+		}
+		if ( y instanceof Float && x instanceof Float)
+		{
+			return (T)(Float)((Float)(x)+(Float)(y));
+		}
+		return null;
 //		else
 //		{
 //			System.out.println("-1-1-1-1-1");
 //			return null;
 //		}
-//	}
+	}
 
-	public ArrayList<T> Inorder(Node<T> root,ArrayList<T> fgh)
+	public T Inorder(Node<T> root,ArrayList<T> fgh,T sum)
 	{
 		if ( root != null )
 		{
-			fgh = Inorder(root.getLeft(),fgh);
-//			d = Addition(d,root.getData());
+			sum = Inorder(root.getLeft(),fgh,sum);
+			sum = Addition(sum,root.getData());
 			fgh.add(root.getData());
-			fgh = Inorder(root.getRight(),fgh);
+			sum = Inorder(root.getRight(),fgh,sum);
 		}
-		return fgh;
+		return sum;
 	}
 	
 	
@@ -195,6 +196,7 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
             if ( z.equals("Integer") )
             {
             	int kaustav = 0;
+            	int CalSum = 0;
             	Node<Integer> q = null;
             	for ( int j=0; j<count; j++ )
             	{
@@ -207,7 +209,7 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
             	abcd.add(q);
             	int roll=0;
             	ArrayList<Integer> fgh = new ArrayList<Integer>();
-        		fgh = abcd.Inorder(q,fgh);
+        		CalSum = (int) abcd.Inorder(q,fgh,CalSum);
         		for ( int j=fgh.size()-1; j>= 0; j-- )
         		{
         			if ( fgh.get(j) == q.getData() )
@@ -219,11 +221,13 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
 //        		ArrayList<Object> jk = abcd.get_map(i);
 //        		jk.add(a);
         		roll++;
+        		System.out.println("Cal Sum "+CalSum);
         		abcd.add_map(roll, kaustav);
             }
             else if ( z.equals("Float") )
             {
             	float kaustav = 0;
+            	float CalSum = 0;
             	Node<Float> q = null;
             	for ( int j=0; j<count; j++ )
             	{
@@ -236,7 +240,7 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
             	abcd.add(q);
             	int roll = 0;
             	ArrayList<Float> fgh = new ArrayList<Float>();
-        		fgh = abcd.Inorder(q,fgh);
+        		CalSum = (float) abcd.Inorder(q,fgh,CalSum);
         		for ( int j=fgh.size()-1; j>= 0; j-- )
         		{
         			if ( fgh.get(j) == q.getData() )
@@ -246,11 +250,13 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
         			}
         		}
         		roll++;
+        		System.out.println("Cal Sum "+CalSum);
         		abcd.add_map(roll, kaustav);
             }
             else
             {
-            	String kaustav="";
+            	String kaustav = "";
+            	String CalSum = "";
             	Node<String> q = null;
             	for ( int j=0; j<count; j++ )
             	{
@@ -264,7 +270,7 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
             	int roll = 0;
             	String g = "";
         		ArrayList<String> fgh = new ArrayList<String>();
-        		fgh = abcd.Inorder(q,fgh);
+        		CalSum = (String) abcd.Inorder(q,fgh,CalSum);
         		for ( int j=fgh.size()-1; j>= 0; j-- )
         		{
         			if ( fgh.get(j).equals(q.getData()) )
@@ -274,7 +280,8 @@ class Teacher<T extends Comparable<T>> extends Node<T>{
         			}
         		}
         		roll++;
-        		abcd.add_map(roll, kaustav);
+        		System.out.println("Cal Sum "+CalSum);
+        		abcd.add_map(roll, CalSum);
             }
         }
         int count =0;

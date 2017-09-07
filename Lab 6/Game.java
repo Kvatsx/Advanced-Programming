@@ -121,6 +121,7 @@ public class Game {
 	private int xIteration;
 	private int xQueen,yQueen;
 	private ArrayList<Knight> Arr;
+	private boolean Reverse;
 	
 	public Game(int ck, int xi, int xq, int yq)
 	{
@@ -129,8 +130,12 @@ public class Game {
 		this.xIteration = xi;
 		this.xQueen = xq;
 		this.yQueen = yq;
+		this.Reverse = false;
 	}
-	
+	public boolean getReverse()
+	{
+		return Reverse;
+	}
 	public void add(Knight z)
 	{
 		Arr.add(z);
@@ -145,16 +150,17 @@ public class Game {
 	}
 	public void checkKnight(int i, int cx, int cy) throws OverlapException
 	{
-		if ( i < Arr.size() )
+		for ( int j=0; j<Arr.size(); j++ )
 		{
-			for ( int j=i; j<Arr.size(); j++ )
+			if ( j != i && Arr.get(j).getx() ==  cx && Arr.get(j).gety() == cy )
 			{
-				if ( Arr.get(j).getx() ==  cx && Arr.get(j).gety() == cy )
+				if ( j < i )
 				{
-					String nam = Arr.get(j).getName();
-					Arr.remove(j);
-					throw new OverlapException("Knights Overlap Exception "+nam);
+					Reverse = true;
 				}
+				String nam = Arr.get(j).getName();
+				Arr.remove(j);
+				throw new OverlapException("Knights Overlap Exception "+nam);
 			}
 		}
 	}
@@ -191,7 +197,7 @@ public class Game {
 					Coordinates myLocation = (Coordinates) currentKnight.getCoordinate();
 					currentKnight.setx(myLocation.getx());
 					currentKnight.sety(myLocation.gety());
-					checkKnight(i+1, myLocation.getx(), myLocation.gety());
+					checkKnight(i, myLocation.getx(), myLocation.gety());
 					checkQueen(myLocation.getx(), myLocation.gety());
 				}
 			}
@@ -210,6 +216,11 @@ public class Game {
 			catch (OverlapException e)
 			{
 				exc = 3;
+				if ( Reverse )
+				{
+					i--;
+					Reverse = false;
+				}
 				w.println("OverlapException: "+e.getMessage());
 			}
 			catch (QueenFoundException e)

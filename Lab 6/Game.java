@@ -184,7 +184,8 @@ public class Game {
 		int i=0;
 		int Round = 1;
 		int count = 0;
-		while ( count != Arr.size() && GameStatus )
+		int itr = 1;
+		while ( count != Arr.size() && GameStatus && itr <= xIteration)
 		{
 			System.out.println("Infinite boop"+" Check");
 			Knight currentKnight = Arr.get(i);
@@ -239,6 +240,7 @@ public class Game {
 				Round++;
 				i=0;
 			}
+			itr++;
 		}
 		w.close();
 	}

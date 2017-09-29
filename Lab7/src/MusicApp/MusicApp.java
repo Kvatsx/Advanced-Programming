@@ -53,7 +53,7 @@ public class MusicApp {
 //		p.Search(nam);
 //	}
 	public static void main(String[] args)throws IOException, ClassNotFoundException {
-		Reader.init(System.in);
+		BufferedReader Reader = new BufferedReader (new InputStreamReader (System.in));
 		MusicApp MyApp = new MusicApp();
 		Song A = new Song("K1","aa",2);
 		Song B = new Song("K2","bb",3);
@@ -66,7 +66,7 @@ public class MusicApp {
 		while(true)
 		{
 			System.out.print("Enter Valid Name of Playlist: ");
-			String name = Reader.next();
+			String name = Reader.readLine();
 			Playlist p = deserialize(name);
 			System.out.println("Total Songs:  "+p.getSize());
 			boolean Flag = false;
@@ -82,15 +82,16 @@ public class MusicApp {
 				System.out.println("6: Exit");
 				System.out.println("-----------------------------");
 				System.out.print("Enter a valid Integer: ");
-				int i = Reader.nextInt();
+				int i = Integer.parseInt(Reader.readLine());
+				System.out.println(i);
 				if ( i == 1 )
 				{
 					System.out.print("Enter Song Name: ");
-					String sname = Reader.next();
+					String sname = Reader.readLine();
 					System.out.print("Enter Singer Name: ");
-					String si = Reader.next();
+					String si = Reader.readLine();
 					System.out.print("Enter Duration of Song: ");
-					int d = Reader.nextInt();
+					int d = Integer.parseInt(Reader.readLine());
 					p.add(new Song(sname,si,d));
 //					serialize(p);
 //					MyApp.add(p);
@@ -98,7 +99,7 @@ public class MusicApp {
 				else if ( i == 2 )
 				{
 					System.out.print("Enter Song name to Delete: ");
-					String nam = Reader.next();
+					String nam = Reader.readLine();
 					p.Delete(nam);
 //					serialize(p);
 //					MyApp.Delete(p);
@@ -106,7 +107,7 @@ public class MusicApp {
 				else if ( i == 3 )
 				{
 					System.out.print("Enter Song name to Search: ");
-					String nam = Reader.next();
+					String nam = Reader.readLine();
 					System.out.println(p.Search(nam));
 //					MyApp.Search(p);
 				}
@@ -137,39 +138,4 @@ public class MusicApp {
 			}
 		}
 	}
-}
-
-/** Class for buffered reading int and double values */
-class Reader {
-    static BufferedReader reader;
-    static StringTokenizer tokenizer;
-
-    /** call this method to initialize reader for InputStream */
-    static void init(InputStream input) {
-        reader = new BufferedReader(
-                     new InputStreamReader(input) );
-        tokenizer = new StringTokenizer("");
-    }
-
-    /** get next word */
-    static String next() throws IOException {
-        while ( ! tokenizer.hasMoreTokens() ) {
-            //TODO add check for eof if necessary
-            tokenizer = new StringTokenizer(
-                   reader.readLine() );
-        }
-        return tokenizer.nextToken();
-    }
-
-    static int nextInt() throws IOException {
-        return Integer.parseInt( next() );
-    }
-	
-    static double nextDouble() throws IOException {
-        return Double.parseDouble( next() );
-    }
-    
-    static float nextFloat() throws IOException {
-    	return Float.parseFloat( next() );
-    }
 }
